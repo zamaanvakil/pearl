@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang='en'>
+    <head>
+        <title> CSE 578 - Data Visualization Project- FALL 2022- PEARL</title>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" />
+        <script src="https://d3js.org/d3.v7.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/d3-color@3"></script>
+        <script src="https://cdn.jsdelivr.net/npm/d3-interpolate@3"></script>
+        <script src="https://cdn.jsdelivr.net/npm/d3-scale-chromatic@3"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/gh/holtzy/D3-graph-gallery@master/LIB/d3.layout.cloud.js"></script>
+        <!-- <script src="js/cloud.js" defer></script> -->
+        <script src="js/main.js" defer></script>
+        <!-- <link rel="stylesheet" href="styles.css" /> -->
+        <style>
+          .dot {
+            height: 20px;
+            width: 20px;
+            border-radius: 50%;
+            border: thin solid black;
+            display: inline-block;
+          }
+          div.scatterplot_tooltip,div.tooltip {
+                position: absolute;
+                background-color: #ffffca;
+                width: auto;
+                max-width: 300px;
+                height: 80px;
+                padding: 5px;
+                font: 12px sans-serif;
+                border-radius: 8px;
+                pointer-events: none;
+            }
+            div.tooltip_area{
+                position: absolute;
+                background-color: #ffffca;
+                width: 250px;
+                height: 250px;
+                padding: 2px;
+                font: 12px sans-serif;
+                border-radius: 8px;
+                pointer-events: none;
+            }
+            div.pie_tooltip{
+              position: absolute;
+              background-color: #ffffca;
+              width: 90px;
+              height: 30px;
+              padding: 2px;
+              font: 12px sans-serif;
+              border-radius: 8px;
+              pointer-events: none;
+              text-align: center;
+              font-weight: 800;
+            }
+            .myContainer{
+              width: 1440px;
+              height: 620px;
+              border: 3px solid black;
+              /* margin-left : 20px; */
+              margin: auto;
+            }
+            .extensions{
+              width: 1440px;
+              height: 510px;
+              border: 3px solid black;
+              margin : auto;
+              background-color: white;
+              /* rgb(186, 226, 225); */
+              margin-top: 20px;
+              /* float:left; */
+              /* margin-left : 20px; */
+              /* margin-bottom: 20px; */
+              margin: auto;
+            }
+            .scatterplotContainer{
+              border: 3px solid black;
+              width: 1440px;
+              /* margin-left: 20px; */
+              margin: auto;
+              height: 420px;
+              padding-top: 13px;
+              display: flex;
+            }
+            .header{
+              border: 3px solid black;
+              height: 45px;
+            }
+            #scatterplot_svg {
+                background-color: white;
+                margin: 0 60px 0 50px;
+            }
+            #tweetContainer {
+                /* margin: 0 60px 0 50px; */
+                height: 400px;
+                overflow-y:auto;
+                position: relative;
+                scroll-behavior: smooth;
+            }
+            #pie_svg, #pie_word_cloud {
+                background-color: #ffffca;
+                margin: 0 60px 0 50px;
+            }
+            li{
+              padding: 10px;
+              font-size: small;
+              outline: double;
+              cursor: pointer;
+            }
+            li:hover {
+              /* color: #2693ff; */
+              background-color: orange;
+            }
+            .tweet_timestamp {
+              font-size: smaller;
+              margin-bottom: 0;
+              font-style: italic;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="pageHeader">
+            <h5 class="text-center">CSE 578 - Data Visualization Project- FALL 2022- PEARL</h5>
+            <h5 class="text-center">Abhinav-Carson-Sai-Sanket-Siddharth-Zamaan</h5>
+        </div>
+        <hr>  
+        <div class="myContainer">
+              <div class="header">
+                  <div class="row" style="height: 45px; align-items: center;">
+                    <div class="col-sm-6 text-center" >
+                      <label for="user"><b>Choose User:</b></label>
+                      <select name="user" id="user" onchange="updateSelectedUser();">
+                        <option value="POTUS">POTUS</option>
+                        <option value="chrisbryanASU">Chris Bryan</option>
+                        <option value="elonmusk">Elon Musk</option>
+                        <option value="h3h3productions">h3h3productions</option>
+                        <option value="realDonaldTrump">Donald J. Trump</option>
+                        <option value="MrBeast">MrBeast</option>
+                        <option value="MKBHD">MKBHD</option>
+                        <option value="hasanthehun">hasanabi</option>
+                        <option value="GretaThunberg">Greta Thunberg</option>
+                        <option value="drewisgooden">Drew Gooden</option>
+                      </select>
+                    </div>
+
+                    <div class="col-sm-6 text-center">
+                      <div style="display: inline;">
+                
+                        <span class="dot" style="background-color:#eb4034;"></span><p style="display: inline;">Anger</p>
+                        <span class="dot" style="background-color:#3bb347;"></span><p style="display: inline;">Fear</p>
+                        <span class="dot" style ="background-color:#fa7916;"></span><p style="display: inline;">Anticipation</p>
+                        <span class="dot" style =background-color:#07f566;></span><p style="display: inline;">Trust</p>
+                        <span class="dot" style="background-color: #07f5f1;"></span><p style="display: inline;">Surprise</p>
+                        <span class="dot" style="background-color: #86b5cf;"></span><p style="display: inline;">Sadness</p>
+                        <span class="dot" style="background-color: #f7f707;"></span><p style="display: inline;">Joy</p>
+                        <span class="dot" style="background-color: #8b07f7;"></span><p style="display: inline;">Disgust</p>
+                      </div>
+                    </div>
+
+                  </div>
+                  
+                  <!-- <label for="startDate"><b>Start Date:</b></label>
+                  <input type="date" id="startDate" name="startDate">
+                  <label for="endDate"><b>End Date:</b></label>
+                  <input type="date" id="endDate" name="endDate">
+                  <button type="button" class="btn btn-primary" onclick="drawStreamGraph();">Update Date</button> -->
+                  
+              </div>
+              <div id="my_dataviz">
+                <svg id="lineGraph">
+                  <defs>
+                    <marker
+                      id="arrow"
+                      markerUnits="strokeWidth"
+                      markerWidth="12"
+                      markerHeight="12"
+                      viewBox="0 0 12 12"
+                      refX="6"
+                      refY="6"
+                      orient="auto">
+                      <path d="M2,2 L10,6 L2,10 L6,6 L2,2" style="fill: #f00;"></path>
+                    </marker>
+                  </defs>
+                </svg>
+                <svg id="streamGraph"></svg>
+              </div>
+        </div>
+        <div class="scatterplotContainer ">
+          <div class="row" style="width: 100%;">
+            <div class="col-sm-6">
+              <svg id="scatterplot_svg"></svg>
+            </div>
+            <div class="col-sm-6">
+              <div id="tweetContainer">
+                <ul id="tweetList" style="list-style: none;">
+                  <!-- <li onmouseover="tweetHover(this)" id=1><a>This is a test tweet.</a> <p class="tweet_timestamp">[Timestamp]</p></li> 
+                  <li><a>This is also a test tweet.</a></li>
+                  <li><a>This is also a test tweet.</a></li>
+                  <li><a>This is also a test tweet.</a></li>
+                  <li><a>This is also a test tweet.</a></li>
+                  <li><a>This is also a test tweet.</a></li>
+                  <li><a>This is also a test tweet.</a></li>
+                  <li><a>This is also a test tweet.</a></li>
+                  <li><a>This is also a test tweet.</a></li> --> 
+                </ul>
+              </div>
+            </div>
+        
+          </div>
+          
+          
+        </div>
+        <hr> <h3 style="text-align: center;">Extensions</h3> </hr>
+        <br>
+        <h4 style="text-align: center;">Marimekko Chart</h4>
+        <div class="extensions" style="height: 640px; width:1500px;">
+          <div id="parentDiv" style="display: flex; justify-content: center; align-items: center; align-self: center; margin-top: 8px;">
+            <div style="display: inline;">   
+              <span class="dot" style="background-color:#eb4034;"></span><p style="display: inline;">Anger</p>
+              <span class="dot" style="background-color:#3bb347;"></span><p style="display: inline;">Fear</p>
+              <span class="dot" style ="background-color:#fa7916;"></span><p style="display: inline;">Anticipation</p>
+              <span class="dot" style =background-color:#07f566;></span><p style="display: inline;">Trust</p>
+              <span class="dot" style="background-color: #07f5f1;"></span><p style="display: inline;">Surprise</p>
+              <span class="dot" style="background-color: #86b5cf;"></span><p style="display: inline;">Sadness</p>
+              <span class="dot" style="background-color: #f7f707;"></span><p style="display: inline;">Joy</p>
+              <span class="dot" style="background-color: #8b07f7;"></span><p style="display: inline;">Disgust</p>
+            </div>
+          </div>
+          <div id="marimekkoChartDiv">
+            <svg id="marimekkoChart"></svg>
+          </div>
+        </div>
+        <br/>
+        <h4 style="text-align: center;">Aggregated Pie Chart</h4>
+        <div class="extensions">
+       
+          <div class="row" style="width: 100%;">
+            <div class="col-sm-6">
+              <svg id="pie_svg"></svg>
+            </div>
+            <div class="col-sm-6">
+              <svg id="pie_word_cloud"></svg>
+            </div>
+          </div>
+
+          
+          
+        </div>
+      
+
+    </body>
+    <!-- <script src="/js/jquery.min.js"></script> -->
+</html> 
